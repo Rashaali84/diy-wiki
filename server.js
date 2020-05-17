@@ -40,9 +40,9 @@ app.use(express.static(path.join(__dirname, 'client', 'build')));
 // failure response: {status: 'error', message: 'Page does not exist.'}
 app.get('/api/page/:slug', (req, res) => {
 
-  const slugParam = req.params.slug;
+  let slugParam = req.params.slug;
   console.log(slugParam);
-  const slugPath = slugToPath(slugParam);
+  const slugPath = slugToPath(slugParam.replace('.md', ''));
   console.log(slugPath);
   readFile(slugPath, 'utf8')
     .then((text) => {
@@ -161,7 +161,6 @@ app.get('/api/tags/:tag', (req, res) => {
     });
 });
 
-// -----------
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));

@@ -34,6 +34,10 @@ function jsonError(res, message) {
 
 app.use(express.static(path.join(__dirname, 'client', 'build')));
 
+// GET: '/api/pages/all'
+// success response: {status:'ok', pages: ['fileName', 'otherFileName']}
+//  file names do not have .md, just the name!
+// failure response: no failure response
 app.get('/api/pages/all', (req, res) => {
   readDir(DATA_DIR)
     .then((names) => {
@@ -53,7 +57,7 @@ app.get('/api/page/:slug', (req, res) => {
 
   let slugParam = req.params.slug;
   console.log(slugParam);
-  const slugPath = slugToPath(slugParam.replace('.md', ''));
+  const slugPath = slugToPath(slugParam.replace('.md', '').toLowerCase());
   readFile(slugPath, 'utf8')
     .then((text) => {
       console.log(text);
@@ -74,7 +78,7 @@ app.post('/api/page/:slug', (req, res) => {
   let body = req.body;
   const slugParam = req.params.slug;
   console.log(slugParam);
-  const slugPath = slugToPath(slugParam.replace('.md', ''));
+  const slugPath = slugToPath(slugParam.replace('.md', '').toLowerCase());
   console.log(slugPath, body);
   writeFile(slugPath, body.body, 'utf8')
     .then(() => {
@@ -86,25 +90,8 @@ app.post('/api/page/:slug', (req, res) => {
     });
 
 });
-// GET: '/api/pages/all'
-// success response: {status:'ok', pages: ['fileName', 'otherFileName']}
-//  file names do not have .md, just the name!
-// failure response: no failure response
-app.get('/api/pages/all', (req, res) => {
 
-  console.log(DATA_DIR);
-  readDir(DATA_DIR, 'utf8')
-    .then((list) => {
-      let newLsit = list.map(function (a) { return a.replace('.md', '') });
-      console.log(newLsit);
-      res.send({ status: 'ok', body: newLsit });
-    })
-    .catch((err) => {
-      console.log('Error', err);
-      res.send({ status: 'error', message: 'error happened !' });
-    });
 
-});
 // GET: '/api/tags/all'
 // success response: {status:'ok', tags: ['tagName', 'otherTagName']}
 //  tags are any word in all documents with a # in front of it
@@ -115,7 +102,7 @@ app.get('/api/tags/all', (req, res) => {
     .then((list) => {
       let listFilesTags = [];
       list.forEach(file => {
-        const slugPath = slugToPath(file.replace('.md', ''));
+        const slugPath = slugToPath(file.replace('.md', '').toLowerCase());
         const fileContent = fs.readFileSync(slugPath, 'utf8');
 
         // We want full words, so we use full word boundary in regex.
@@ -151,7 +138,7 @@ app.get('/api/tags/:tag', (req, res) => {
     .then((list) => {
       let listFilesTags = [];
       list.forEach(file => {
-        const slugPath = slugToPath(file.replace('.md', ''));
+        const slugPath = slugToPath(file.replace('.md', '').toLowerCase());
         const fileContent = fs.readFileSync(slugPath, 'utf8');
 
         // We want full words, so we use full word boundary in regex.

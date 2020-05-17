@@ -34,7 +34,18 @@ function jsonError(res, message) {
 
 app.use(express.static(path.join(__dirname, 'client', 'build')));
 
-
+app.get('/api/pages/all', (req, res) => {
+  readDir(DATA_DIR)
+    .then((names) => {
+      console.log(names);
+      console.log({ status: 'ok', pages: names });
+      res.send({ status: 'ok', pages: names });
+    })
+    .catch((err) => {
+      console.log('Error', err);
+      res.send({ status: 'error', pages: 'Pages do not exist.' });
+    });
+});
 // GET: '/api/page/:slug'
 // success response: {status: 'ok', body: '<file contents>'}
 // failure response: {status: 'error', message: 'Page does not exist.'}
@@ -43,7 +54,6 @@ app.get('/api/page/:slug', (req, res) => {
   let slugParam = req.params.slug;
   console.log(slugParam);
   const slugPath = slugToPath(slugParam.replace('.md', ''));
-  console.log(slugPath);
   readFile(slugPath, 'utf8')
     .then((text) => {
       console.log(text);
@@ -61,12 +71,12 @@ app.get('/api/page/:slug', (req, res) => {
 // failure response: {status: 'error', message: 'Could not write page.'}
 app.post('/api/page/:slug', (req, res) => {
 
-  const body = req.body.toString();
+  let body = req.body;
   const slugParam = req.params.slug;
   console.log(slugParam);
-  const slugPath = slugToPath(slugParam);
-  console.log(slugPath);
-  writeFile(slugPath, body, 'utf8')
+  const slugPath = slugToPath(slugParam.replace('.md', ''));
+  console.log(slugPath, body);
+  writeFile(slugPath, body.body, 'utf8')
     .then(() => {
       res.send({ status: 'ok' });
     })
@@ -115,8 +125,8 @@ app.get('/api/tags/all', (req, res) => {
           let tagList = fileContent.match(regex);
           console.log('tag is ' + tagList)
           tagList.forEach((item) => {
-            if (!listFilesTags.includes(item))
-              listFilesTags.push(item)
+            if (!listFilesTags.includes(item.replace('#', '')))
+              listFilesTags.push(item.replace('#', ''))
           });
         }
       });
@@ -160,6 +170,7 @@ app.get('/api/tags/:tag', (req, res) => {
       res.send({ status: 'error', message: 'error happened !' });
     });
 });
+
 
 
 app.get('*', (req, res) => {

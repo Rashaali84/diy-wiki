@@ -31,19 +31,9 @@ function jsonError(res, message) {
   res.json({ status: 'error', message });
 }
 
-<<<<<<< HEAD
-app.get('/', (req, res) => {
-  res.json({ wow: 'it works!' });
-});
-app.use(express.static('client'));
-// If you want to see the wiki client, run npm install && npm build in the client folder,
-// then comment the line above and uncomment out the lines below and comment the line above.
-//app.get('*', (req, res) => {
-// res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
-//});
-=======
+
 app.use(express.static(path.join(__dirname, 'client', 'build')));
->>>>>>> upstream/master
+
 
 // GET: '/api/page/:slug'
 // success response: {status: 'ok', body: '<file contents>'}
@@ -169,24 +159,14 @@ app.get('/api/tags/:tag', (req, res) => {
       console.log('Error', err);
       res.send({ status: 'error', message: 'error happened !' });
     });
-
-<<<<<<< HEAD
 });
-app.get('/api/page/all', async (req, res) => {
-  const names = await fs.readdir(DATA_DIR);
-  console.log(names);
-  jsonOK(res, {});
-=======
+
 // -----------
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
->>>>>>> upstream/master
+
 });
 
-
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
-});
 const port = process.env.PORT || 5000;
 app.listen(port, () => console.log(`Wiki app is serving at http://localhost:${port}`));

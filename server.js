@@ -117,8 +117,13 @@ app.get('/api/tags/all', (req, res) => {
         // We want full words, so we use full word boundary in regex.
         const regex = new RegExp(TAG_RE);
         if (regex.test(fileContent)) {
-          listFilesTags.push(file)
-          console.log(`Your word was found in file: ${file}`);
+          console.log('file content is ' + fileContent);
+          let tagList = fileContent.match(regex);
+          console.log('tag is ' + tagList)
+          tagList.forEach((item) => {
+            if (!listFilesTags.includes(item))
+              listFilesTags.push(item)
+          });
         }
       });
       console.log(listFilesTags);
@@ -167,6 +172,8 @@ app.get('/api/page/all', async (req, res) => {
   console.log(names);
   jsonOK(res, {});
 });
-
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
+});
 const port = process.env.PORT || 5000;
 app.listen(port, () => console.log(`Wiki app is serving at http://localhost:${port}`));

@@ -151,9 +151,9 @@ app.get('/api/tags/:tag', (req, res) => {
         const fileContent = fs.readFileSync(slugPath, 'utf8');
 
         // We want full words, so we use full word boundary in regex.
-        console.log('# ' + tagParam);
+        console.log('#' + tagParam);
         //const regex = new RegExp('# ' + tagParam);
-        if (fileContent.indexOf('# ' + tagParam) >= 0) {
+        if (fileContent.indexOf('#' + tagParam) >= 0) {
           listFilesTags.push(file)
           console.log(`Your word was found in file: ${file}`);
         }
@@ -172,6 +172,8 @@ app.get('/api/page/all', async (req, res) => {
   console.log(names);
   jsonOK(res, {});
 });
+
+
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
 });

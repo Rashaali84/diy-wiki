@@ -9,8 +9,7 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.raw({ type: 'text/plain' }));
-// Uncomment this out once you've made your first route.
-//app.use(express.static(path.join(__dirname, 'client', 'build')));
+
 
 // some helper functions you can use
 const readFile = util.promisify(fs.readFile);
@@ -31,7 +30,6 @@ function jsonError(res, message) {
   res.json({ status: 'error', message });
 }
 
-
 app.use(express.static(path.join(__dirname, 'client', 'build')));
 
 // GET: '/api/pages/all'
@@ -41,31 +39,27 @@ app.use(express.static(path.join(__dirname, 'client', 'build')));
 app.get('/api/pages/all', (req, res) => {
   readDir(DATA_DIR)
     .then((names) => {
-      console.log(names);
-      console.log({ status: 'ok', pages: names });
-      res.send({ status: 'ok', pages: names });
+      res.status(200).send({ status: 'ok', pages: names });
     })
     .catch((err) => {
-      console.log('Error', err);
-      res.send({ status: 'error', pages: 'Pages do not exist.' });
+      res.status(404).send({ status: 'error', pages: 'Pages do not exist.' });
     });
 });
 // GET: '/api/page/:slug'
 // success response: {status: 'ok', body: '<file contents>'}
 // failure response: {status: 'error', message: 'Page does not exist.'}
 app.get('/api/page/:slug', (req, res) => {
-
   let slugParam = req.params.slug;
   console.log(slugParam);
-  const slugPath = slugToPath(slugParam.replace('.md', '').toLowerCase());
+  const slugPath = slugToPath(slugParam.replace(/(\.md)$/gi, '').toLowerCase());
   readFile(slugPath, 'utf8')
     .then((text) => {
       console.log(text);
-      res.send({ status: 'ok', body: text });
+      res.status(200).send({ status: 'ok', body: text });
     })
     .catch((err) => {
       console.log('Error', err);
-      res.send({ status: 'error', message: 'Page does not exist.' });
+      res.status(404).send({ status: 'error', message: 'Page does not exist.' });
     });
 
 });
@@ -78,15 +72,15 @@ app.post('/api/page/:slug', (req, res) => {
   let body = req.body;
   const slugParam = req.params.slug;
   console.log(slugParam);
-  const slugPath = slugToPath(slugParam.replace('.md', '').toLowerCase());
+  const slugPath = slugToPath(slugParam.replace(/(\.md)$/gi, '').toLowerCase());
   console.log(slugPath, body);
   writeFile(slugPath, body.body, 'utf8')
     .then(() => {
-      res.send({ status: 'ok' });
+      res.status(200).send({ status: 'ok' });
     })
     .catch((err) => {
       console.log('Error', err);
-      res.send({ status: 'error', message: 'Could not write page.' });
+      res.send({ status: 'error', message: 'Could not write in this page.' });
     });
 
 });
@@ -102,7 +96,7 @@ app.get('/api/tags/all', (req, res) => {
     .then((list) => {
       let listFilesTags = [];
       list.forEach(file => {
-        const slugPath = slugToPath(file.replace('.md', '').toLowerCase());
+        const slugPath = slugToPath(file.replace(/(\.md)$/gi, '').toLowerCase());
         const fileContent = fs.readFileSync(slugPath, 'utf8');
 
         // We want full words, so we use full word boundary in regex.
@@ -118,11 +112,11 @@ app.get('/api/tags/all', (req, res) => {
         }
       });
       console.log(listFilesTags);
-      res.send({ status: 'ok', tags: listFilesTags });
+      res.status(200).send({ status: 'ok', tags: listFilesTags });
     })
     .catch((err) => {
       console.log('Error', err);
-      res.send({ status: 'error', message: 'error happened !' });
+      res.send({ status: 'error', message: err.message });
     });
 
 });
@@ -138,23 +132,21 @@ app.get('/api/tags/:tag', (req, res) => {
     .then((list) => {
       let listFilesTags = [];
       list.forEach(file => {
-        const slugPath = slugToPath(file.replace('.md', '').toLowerCase());
+        const slugPath = slugToPath(file.replace(/(\.md)$/gi, '').toLowerCase());
         const fileContent = fs.readFileSync(slugPath, 'utf8');
-
         // We want full words, so we use full word boundary in regex.
-        console.log('#' + tagParam);
-        //const regex = new RegExp('# ' + tagParam);
+        console.log(tagParam);
         if (fileContent.indexOf('#' + tagParam) >= 0) {
           listFilesTags.push(file)
           console.log(`Your word was found in file: ${file}`);
         }
       });
       console.log(listFilesTags);
-      res.send({ status: 'ok', tag: tagParam, pages: listFilesTags });
+      res.status(200).send({ status: 'ok', tag: tagParam, pages: listFilesTags });
     })
     .catch((err) => {
       console.log('Error', err);
-      res.send({ status: 'error', message: 'error happened !' });
+      res.send({ status: 'error', message: err.message });
     });
 });
 

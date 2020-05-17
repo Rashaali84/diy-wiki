@@ -31,6 +31,7 @@ function jsonError(res, message) {
   res.json({ status: 'error', message });
 }
 
+<<<<<<< HEAD
 app.get('/', (req, res) => {
   res.json({ wow: 'it works!' });
 });
@@ -40,6 +41,9 @@ app.use(express.static('client'));
 //app.get('*', (req, res) => {
 // res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
 //});
+=======
+app.use(express.static(path.join(__dirname, 'client', 'build')));
+>>>>>>> upstream/master
 
 // GET: '/api/page/:slug'
 // success response: {status: 'ok', body: '<file contents>'}
@@ -166,11 +170,18 @@ app.get('/api/tags/:tag', (req, res) => {
       res.send({ status: 'error', message: 'error happened !' });
     });
 
+<<<<<<< HEAD
 });
 app.get('/api/page/all', async (req, res) => {
   const names = await fs.readdir(DATA_DIR);
   console.log(names);
   jsonOK(res, {});
+=======
+// -----------
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
+>>>>>>> upstream/master
 });
 
 
